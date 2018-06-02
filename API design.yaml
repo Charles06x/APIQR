@@ -1,0 +1,343 @@
+swagger: "2.0"
+info:
+  title: "QR assistant"
+  description: "This is a first try of API rest for the Software Engineering I."
+  version: "1.0.0"
+  contact:
+    email: "T00039395@gmail.com"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "Localhost"
+basePath: "/v2"
+
+
+schemes:
+- "http"
+paths:
+    
+    ####Students' methods
+    
+    /estudiantes:
+    
+      get:
+        tags: 
+        - "estudiantes"
+        operationId: "getStudents"
+        responses: 
+          200:
+            description: "Successful operation"
+            
+        
+  
+    /estudiantes/logout:
+      get:
+        tags:
+        - "estudiantes"
+        summary: "Logs out current logged in Students session"
+        description: "xd"
+        operationId: "logoutStudents"
+        produces:
+        - "application/xml"
+        - "application/json"
+        parameters: []
+        responses:
+          default:
+            description: "successful operation"
+    
+    /estudiantes/login:
+      post:
+        tags:
+        - "estudiantes"
+        summary: "Logs Students into the system"
+        description: ""
+        operationId: "loginStudents"
+        produces:
+        - "application/xml"
+        - "application/json"
+        - "token"   #Not sure... xD
+        consumes:
+        - "application/x-www-form-urlencoded"
+        parameters:
+        - name: "id"
+          in: "formData"
+          description: "The Students code for login"
+          required: true
+          type: "string"
+        - name: "password"
+          in: "formData"
+          description: "The password for login in clear text"
+          required: true
+          type: "string"
+        responses:
+          200:
+            description: "successful operation"
+            schema:
+              type: "string"
+            headers:
+              X-Rate-Limit:
+                type: "integer"
+                format: "int32"
+                description: "calls per hour allowed by the Students"
+              X-Expires-After:
+                type: "string"
+                format: "date-time"
+                description: "date in UTC when token expires"
+          400:
+            description: "Invalid id/password supplied"
+  
+    /estudiantes/{ID}:
+      get:
+        tags:
+        - "estudiantes"
+        summary: "Get user by Students name"
+        description: ""
+        operationId: "getStudentsByName"
+        produces:
+        - "application/xml"
+        - "application/json"
+        parameters:
+        - name: "ID"
+          in: "path"
+          description: "El código del estudiante que se desea buscar."
+          required: true
+          type: "string"
+        responses:
+          200:
+            description: "successful operation"
+            schema:
+              $ref: "#/definitions/estudiantes"
+          400:
+            description: "Código suministrado inválido."
+          404:
+            description: "No existe un estudiante con ese código."
+      
+      
+    ###Attendees' methods
+    
+    /attendees:
+      get:
+        tags:
+        - "Attendees"
+        summary: "Obtiene TODAS las asistencias."
+        operationId: "getAttendees"
+        responses:
+          200: 
+            description: "Successful"
+    
+    
+    /attendees/add:        
+      post: 
+        tags:
+        - "Attendees"
+        
+        consumes: 
+        - "application/x-www-form-urlencoded"
+        
+        parameters:
+        - name: "idEstudiante"
+          in: "formData"
+          description: "El codigo del estudiante"
+          required: true
+          type: "integer"
+        - name: "nrc"
+          in: "formData"
+          description: "NRC de la clase"
+          required: true
+          type: "string"
+        - name: "created_at"
+          in: "formData" 
+          type: "string"
+          format: "date-time"
+        - name: "updated_at"
+          in: "formData" 
+          type: "string"
+          format: "date-time"
+        - name: "estado"
+          type: "integer"
+          in: "formData"
+          
+        responses:
+          200:
+            description: "successful operation"
+            schema:
+              type: "string"
+              
+    /modifyAttendee/:
+      put:
+        tags: 
+        - 'Attendees'
+        
+        responses:
+          200:
+            description: "successful operation"
+            schema:
+              type: "string"
+        
+        parameters: 
+        - name: 'id'
+          type: 'integer'
+          required: true
+          in: 'path'
+      
+    /attendees/delete/{id}:
+      delete:
+        tags: 
+        - "Attendees"
+        
+        parameters: 
+        - name: "id"
+          type: "integer"
+          required: true
+          in: "path"
+        
+        responses:
+          200:
+            description: "successful operation"
+            schema:
+              type: "string"
+    
+    ##Status'methods
+    
+    /estado:
+      get:
+        tags: 
+        - "Estado_att"
+        
+        responses:
+          200:
+            description: "successful operation"
+            schema:
+              type: "string"
+          
+    /modifyStatus:
+      put:
+        tags: 
+        - 'Estado_att'
+        
+        consumes: 
+        - "application/x-www-form-urlencoded"
+        
+        responses:
+          200:
+            description: "successful operation"
+            schema:
+              type: "string"
+        
+        parameters: 
+        - name: 'id'
+          type: 'integer'
+          required: true
+          in: 'formData'
+        
+        - name: 'descripcion'
+          type: 'string'
+          in: 'formData'
+    
+    /addStatus:
+      post:
+        tags:
+        - 'Estado_att'
+        
+        consumes: 
+        - "application/x-www-form-urlencoded"
+        
+        responses:
+          200:
+            description: "successful operation"
+            schema:
+              type: "string"
+        
+        parameters: 
+        - name: 'id'
+          type: 'integer'
+          required: true
+          in: 'formData'
+        
+        - name: 'descripcion'
+          type: 'string'
+          in: 'formData'
+        
+          
+        
+        
+            
+securityDefinitions:
+  assistant_auth:
+    type: "oauth2"
+    authorizationUrl: "http://petstore.swagger.io/oauth/dialog"
+    flow: "implicit"
+    scopes:
+      write:professors: "modify professors in your account"
+      read:professors: "read your professors"
+  api_key:
+    type: "apiKey"
+    name: "api_key"
+    in: "header"
+definitions:
+  
+
+  estudiantes:
+    type: "object"
+    required: 
+    - "ID"
+    - "NOMBRES"
+    - "APELLIDOS"
+    properties:
+      id:
+        type: "string"
+      firstName:
+        type: "string"
+      lastName:
+        type: "string"
+      code:
+        type: "string"
+        example: "T00039395"
+      email:
+        type: "string"
+      password:
+        type: "string"
+      phone:
+        type: "integer"
+        
+    xml:
+      name: "User"
+ 
+  attendees:
+    type: "object"
+    
+    properties:
+      id:
+        type: "integer"
+      idEstudiante:
+        type: "string"
+      nrc:
+        type: "string"
+      created_at:
+        type: "string"
+        format: "date-time"
+      updated_at:
+        type: "string"
+        format: "date-time"
+      estado:
+        type: "integer"
+        
+  estado_att:
+    type: "object"
+    properties:
+      id: 
+        type: "integer"
+      descripcion:
+        type: "string"
+      
+  
+  ApiResponse:
+    type: "object"
+    properties:
+      code:
+        type: "integer"
+        format: "int32"
+      type:
+        type: "string"
+      message:
+        type: "string"
